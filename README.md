@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 AI Startup Evaluator – Startup Ecosystem MVP
 ===========================================
 
@@ -128,3 +129,6 @@ This project uses a **FastAPI backend** for all CRUD and AI operations. The Stre
 
 You can also use `python -m ...` if your environment is already activated.
 
+=======
+# AI-Startup-Evaluator
+>>>>>>> b098cfb4996322a51c7039249668c7b9c7f33975
