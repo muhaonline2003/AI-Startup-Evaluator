@@ -2,6 +2,7 @@
 AI logic for FastAPI backend.
 Handles OpenAI API calls and graceful demo mode fallback.
 """
+
 import os
 import random
 import json
@@ -12,20 +13,33 @@ from dotenv import load_dotenv
 load_dotenv()
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
+
 # --- OpenAI client ---
 def get_openai_client():
-    if OPENAI_API_KEY:
+    if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+        return None
+    try:
         return OpenAI(api_key=OPENAI_API_KEY)
-    return OpenAI()
+    except Exception:
+        return None
 
-client = get_openai_client()
 
 def show_demo_mode_banner():
-    return {"demo_mode": True, "message": "Demo AI Mode: OpenAI unavailable, using mock analysis"}
+    return {
+        "demo_mode": True,
+        "message": "Demo AI Mode: OpenAI unavailable, using mock analysis",
+    }
+
 
 def mock_ai_analysis(startup=None):
-    names = ["Impressive team", "Clear market", "Strong solution", "Needs traction", "Competitive space"]
-    summary = f"{random.choice(['Promising','Solid','Interesting','Early-stage','Competitive'])} startup with {random.choice(['a clear problem','a strong team','market potential','room for improvement'])}."
+    names = [
+        "Impressive team",
+        "Clear market",
+        "Strong solution",
+        "Needs traction",
+        "Competitive space",
+    ]
+    summary = f"{random.choice(['Promising', 'Solid', 'Interesting', 'Early-stage', 'Competitive'])} startup with {random.choice(['a clear problem', 'a strong team', 'market potential', 'room for improvement'])}."
     score = random.choice(["7.5", "8.2", "6.8", "7.9", "8.7", "6.2"])
     return {
         "summary": summary,
@@ -33,14 +47,40 @@ def mock_ai_analysis(startup=None):
         "problem_clarity": random.choice(["Clear", "Good", "Moderate", "Needs work"]),
         "solution_strength": random.choice(["Strong", "Good", "Average", "Unclear"]),
         "market_potential": random.choice(["High", "Moderate", "Emerging", "Niche"]),
-        "business_model": random.choice(["SaaS", "Marketplace", "Subscription", "Freemium"]),
-        "investor_readiness": random.choice(["Ready for seed", "Needs more traction", "Promising but early", "Investor-ready"]),
-        "investor_recommendation": random.choice(["Consider for next round", "Monitor progress", "Schedule meeting", "Pass for now"]),
+        "business_model": random.choice(
+            ["SaaS", "Marketplace", "Subscription", "Freemium"]
+        ),
+        "investor_readiness": random.choice(
+            [
+                "Ready for seed",
+                "Needs more traction",
+                "Promising but early",
+                "Investor-ready",
+            ]
+        ),
+        "investor_recommendation": random.choice(
+            [
+                "Consider for next round",
+                "Monitor progress",
+                "Schedule meeting",
+                "Pass for now",
+            ]
+        ),
         "strengths": [random.choice(names), "Clear vision"],
-        "weaknesses": [random.choice(["Needs more data", "Unclear go-to-market", "Early revenue"]),],
-        "risks": [random.choice(["Market crowded", "Tech risk", "Execution risk"]),],
-        "suggestions": [random.choice(["Clarify business model", "Show more traction", "Refine pitch deck"]), "Highlight team experience"],
+        "weaknesses": [
+            random.choice(["Needs more data", "Unclear go-to-market", "Early revenue"]),
+        ],
+        "risks": [
+            random.choice(["Market crowded", "Tech risk", "Execution risk"]),
+        ],
+        "suggestions": [
+            random.choice(
+                ["Clarify business model", "Show more traction", "Refine pitch deck"]
+            ),
+            "Highlight team experience",
+        ],
     }
+
 
 def analyze_startup_pitch(payload: models.AIStartupEvalRequest):
     pitch_text = payload.pitch_text or ""
@@ -79,7 +119,8 @@ Pitch:
 {pitch_text}
 """
     try:
-        if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
+        client = get_openai_client()
+        if client is None:
             return mock_ai_analysis(payload)
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
@@ -95,6 +136,7 @@ Pitch:
     except Exception:
         return mock_ai_analysis(payload)
 
+
 def assistant_response(payload: models.AIAssistantRequest):
     """Handles general AI assistant Q&A using OpenAI chat completion."""
     system_prompt = (
@@ -103,8 +145,11 @@ def assistant_response(payload: models.AIAssistantRequest):
     )
     user_prompt = payload.question
     try:
-        if not OPENAI_API_KEY or OPENAI_API_KEY.strip() == "":
-            return {"answer": "This is a demo AI assistant response. Add your OpenAI key for real answers."}
+        client = get_openai_client()
+        if client is None:
+            return {
+                "answer": "This is a demo AI assistant response. Add your OpenAI key for real answers."
+            }
         response = client.chat.completions.create(
             model="gpt-4.1-mini",
             messages=[
