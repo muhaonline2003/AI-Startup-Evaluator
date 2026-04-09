@@ -1,134 +1,125 @@
-<<<<<<< HEAD
-AI Startup Evaluator – Startup Ecosystem MVP
-===========================================
+AI Startup Evaluator
+====================
 
 Overview
 --------
 
-This project is a hackathon-friendly **AI Startup Evaluator** and mini **startup ecosystem** built with Streamlit and the OpenAI API.
+AI Startup Evaluator is a Streamlit frontend with a FastAPI backend and JSON file storage. Founders can submit a startup pitch, get AI feedback, browse startups, and post networking requests.
 
-Founders can submit their startup profiles and pitch decks, get a structured AI evaluation, and appear in a simple startup directory and networking board.
+Repository Structure
+--------------------
 
-Database / Storage
-------------------
+- `main.py` - Streamlit UI
+- `backend/` - FastAPI app, AI logic, and models
+- `backend_api.py` - HTTP client used by Streamlit
+- `startups.json` - startup storage
+- `networking.json` - networking post storage
+- `.env` - local secrets only, not committed
+- `.env.example` - template for new users
 
-- Uses lightweight **JSON files as the database** so it runs easily on any laptop.
-- Startups are stored in: `startups.json` (acts as a mini table of startup profiles).
-- Founder networking posts are stored in: `networking.json`.
-- In a real production system, these JSON files can be replaced with **SQLite** or **PostgreSQL** while keeping the same CRUD patterns.
+What the app does
+-----------------
 
-CRUD Features
--------------
+- Submit startup details and pitch text
+- Run AI pitch analysis through the backend
+- Ask the AI assistant startup questions
+- View and manage startup records
+- Post and browse networking requests
 
-Startup profiles support **full CRUD** from the UI:
+What new users need
+-------------------
 
-- **Create** – founders submit startup details and pitch from the *Founder Submission & AI Evaluation* page.
-- **Read** – investors and ecosystem members browse startups in the *Startup Directory (Investor Discovery)* page.
-- **Update** – admins/founders can edit startup profiles from the *Manage Startups (CRUD)* page.
-- **Delete** – startups can be removed from the JSON database via the *Manage Startups (CRUD)* page.
+- Python 3.11+
+- A virtual environment in `.venv`
+- Their own OpenAI API key
 
-Each startup is given a simple integer **ID** so it can be selected, edited, and deleted from the interface.
+Important about the API key
+---------------------------
 
-AI Features
+- Do not commit your real API key to GitHub.
+- Keep it in a local `.env` file.
+- Other people should add their own key after cloning.
+- If someone clones the project without a key, the app can still open, but AI responses will fall back to demo behavior.
+
+Local Setup
 -----------
 
-The app connects to the **OpenAI API** and analyzes startup pitches (PDF deck or pasted pitch text):
+1. Clone the repository:
 
-- Returns a **structured JSON** analysis per startup.
-- Provides:
-  - Overall **score out of 10**.
-  - **Summary** of the startup.
-  - **Problem clarity** and **solution strength**.
-  - **Market potential** and **business model clarity**.
-  - **Investor readiness** and **investor recommendation**.
-  - Top **strengths**, **weaknesses**, **risks**, and **suggestions for improvement**.
+  ```bash
+  git clone https://github.com/muhaonline2003/AI-Startup-Evaluator.git
+  cd AI-Startup-Evaluator
+  ```
 
-This analysis powers both the founder-facing feedback and the investor discovery view.
+2. Create and activate a virtual environment if needed:
 
-Founder Networking
-------------------
+  ```bash
+  python -m venv .venv
+  .\.venv\Scripts\activate
+  ```
 
-The **Founder Networking** page lets founders post what they are looking for:
+3. Install dependencies:
 
-- Fields: founder name, startup name, **looking for** (investor, cofounder, developer, mentor, early adopters, other), and a short message.
-- Posts are saved to `networking.json` and displayed in a simple networking board in the UI.
-- This adds a lightweight **founder networking layer** on top of the startup profiles.
+  ```bash
+  pip install -e .
+  ```
 
-How to Run
-----------
+4. Create a `.env` file in the project root with your OpenAI key:
 
-1. Install dependencies (from the project root):
+  ```env
+  OPENAI_API_KEY=your_real_key_here
+  ```
 
-	```bash
-	pip install -e .
-	```
+5. Start the backend in one terminal:
 
-2. Set your OpenAI API key, for example in a `.env` file:
-
-	```env
-	OPENAI_API_KEY=your_real_key_here
-	```
-
-3. Start the Streamlit app:
-
-	```bash
-	streamlit run main.py
-	```
-
-This will launch the **AI Startup Evaluator** with:
-
-- Founder submission + AI evaluation.
-- Startup directory / investor discovery.
-- Manage startups (CRUD).
-- Founder networking board.
-
-Backend Setup & API
-------------------
-
-This project uses a **FastAPI backend** for all CRUD and AI operations. The Streamlit frontend communicates with the backend via HTTP API calls (see `backend_api.py`).
-
-### How to Start the Backend
-
-1. Open a new terminal in the project root.
-2. Run the FastAPI server:
-
-   ```bash
-   uvicorn backend.main:app --reload
-   ```
-
-   - The backend will start at `http://127.0.0.1:8000` by default.
-   - You can check the API docs at `http://127.0.0.1:8000/docs`.
-
-### How the Frontend Connects
-
-- The Streamlit app (`main.py`) uses `backend_api.py` to send all data and AI requests to the FastAPI backend.
-- Make sure the backend is running **before** starting the Streamlit frontend.
-
-### Health Check
-
-- To verify the backend is running, visit:  
-  `http://127.0.0.1:8000/health`
-- You should see `{"status": "ok"}`.
-
-### Troubleshooting
-
-- If you see messages like `(Real AI assistant logic not yet implemented)` or mock answers, it means the frontend could not reach the backend or the backend returned an error.
-- Make sure both the backend and frontend are running, and that your API key is set.
-- Check the backend terminal for errors.
-
-**Windows (with virtual environment):**
-
-- Start the backend (FastAPI):
   ```bash
   .\.venv\Scripts\python -m uvicorn backend.main:app --reload
   ```
-- Start the frontend (Streamlit):
+
+6. Start the frontend in a second terminal:
+
   ```bash
   .\.venv\Scripts\python -m streamlit run main.py
   ```
 
-You can also use `python -m ...` if your environment is already activated.
+7. Open the app in your browser:
 
-=======
-# AI-Startup-Evaluator
->>>>>>> b098cfb4996322a51c7039249668c7b9c7f33975
+  - Streamlit: http://localhost:8501
+  - Backend health: http://127.0.0.1:8000/health
+  - API docs: http://127.0.0.1:8000/docs
+
+Running Without an API Key
+--------------------------
+
+- The app will still launch.
+- AI features will use demo or fallback responses.
+- For real answers, each user must add their own OpenAI key.
+
+GitHub Upload Steps
+-------------------
+
+1. Check changes:
+
+  ```bash
+  git status
+  ```
+
+2. Add and commit:
+
+  ```bash
+  git add .
+  git commit -m "Clean project structure and update README"
+  ```
+
+3. Push to GitHub:
+
+  ```bash
+  git push origin main
+  ```
+
+Troubleshooting
+---------------
+
+- If the backend does not start, check that `.venv` exists and that you used the correct Windows command.
+- If AI responses are demo-only, confirm `OPENAI_API_KEY` is set in `.env` or in the current shell.
+- If GitHub rejects a push, run `git pull origin main --allow-unrelated-histories` once and then push again.
